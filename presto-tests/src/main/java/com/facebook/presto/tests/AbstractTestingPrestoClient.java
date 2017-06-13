@@ -136,6 +136,7 @@ public abstract class AbstractTestingPrestoClient<T>
         return new ClientSession(
                 server,
                 session.getIdentity().getUser(),
+                session.getPassword(),
                 session.getSource().orElse(null),
                 session.getClientInfo().orElse(null),
                 session.getCatalog().orElse(null),

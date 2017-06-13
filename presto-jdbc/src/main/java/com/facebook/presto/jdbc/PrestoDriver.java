@@ -46,7 +46,9 @@ public class PrestoDriver
 
     private static final String USER_PROPERTY = "user";
 
-    private final QueryExecutor queryExecutor;
+    private static final String PASSWORD_PROPERTY = "password";
+
+    private QueryExecutor queryExecutor;
 
     static {
         String version = nullToEmpty(PrestoDriver.class.getPackage().getImplementationVersion());
@@ -70,11 +72,6 @@ public class PrestoDriver
         }
     }
 
-    public PrestoDriver()
-    {
-        this.queryExecutor = QueryExecutor.create(DRIVER_NAME + "/" + DRIVER_VERSION);
-    }
-
     @Override
     public void close()
     {
@@ -94,7 +91,11 @@ public class PrestoDriver
             throw new SQLException(format("Username property (%s) must be set", USER_PROPERTY));
         }
 
-        return new PrestoConnection(new PrestoDriverUri(url), user, queryExecutor);
+        String password = info.getProperty(PASSWORD_PROPERTY);
+
+        queryExecutor = QueryExecutor.create(DRIVER_NAME + "/" + DRIVER_VERSION, user, password);
+
+        return new PrestoConnection(new PrestoDriverUri(url), user, password, queryExecutor);
     }
 
     @Override

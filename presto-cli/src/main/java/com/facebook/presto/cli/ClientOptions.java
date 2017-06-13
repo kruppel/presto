@@ -133,6 +133,7 @@ public class ClientOptions
         return new ClientSession(
                 parseServer(server),
                 user,
+                null,
                 source,
                 null, // client-supplied payload field not yet supported in CLI
                 catalog,

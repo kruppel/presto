@@ -14,13 +14,15 @@
 package com.facebook.presto.jdbc;
 
 import com.facebook.presto.client.ClientSession;
+import com.facebook.presto.client.LdapRequestFilter;
 import com.facebook.presto.client.QueryResults;
 import com.facebook.presto.client.ServerInfo;
 import com.facebook.presto.client.StatementClient;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.google.common.net.HostAndPort;
 import io.airlift.http.client.HttpClient;
 import io.airlift.http.client.HttpClientConfig;
+import io.airlift.http.client.HttpRequestFilter;
 import io.airlift.http.client.Request;
 import io.airlift.http.client.jetty.JettyHttpClient;
 import io.airlift.http.client.jetty.JettyIoPool;
@@ -35,6 +37,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static io.airlift.http.client.HttpUriBuilder.uriBuilderFrom;
@@ -83,14 +86,14 @@ class QueryExecutor
         close();
     }
 
-    static QueryExecutor create(String userAgent)
+    static QueryExecutor create(String userAgent, String user, String password)
     {
         return create(new JettyHttpClient(
                 new HttpClientConfig()
                         .setConnectTimeout(new Duration(10, TimeUnit.SECONDS))
                         .setSocksProxy(getSystemSocksProxy()),
                 new JettyIoPool("presto-jdbc", new JettyIoPoolConfig()),
-                ImmutableSet.of(new UserAgentRequestFilter(userAgent))));
+                getRequestFilters(userAgent, Optional.of(user), Optional.of(password))));
     }
 
     static QueryExecutor create(HttpClient httpClient)
@@ -111,5 +114,18 @@ class QueryExecutor
             }
         }
         return null;
+    }
+
+    private static Iterable<HttpRequestFilter> getRequestFilters(String userAgent, Optional<String> user, Optional<String> password)
+    {
+        if (user.isPresent() && password.isPresent()) {
+            return ImmutableList.of(
+                new UserAgentRequestFilter(userAgent),
+                new LdapRequestFilter(user.get(), password.get())
+            );
+        }
+        else {
+            return ImmutableList.of(new UserAgentRequestFilter(userAgent));
+        }
     }
 }

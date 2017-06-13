@@ -33,6 +33,7 @@ public class ClientSession
 {
     private final URI server;
     private final String user;
+    private final String password;
     private final String source;
     private final String clientInfo;
     private final String catalog;
@@ -50,6 +51,7 @@ public class ClientSession
         return new ClientSession(
                 session.getServer(),
                 session.getUser(),
+                session.getPassword(),
                 session.getSource(),
                 session.getClientInfo(),
                 catalog,
@@ -68,6 +70,7 @@ public class ClientSession
         return new ClientSession(
                 session.getServer(),
                 session.getUser(),
+                session.getPassword(),
                 session.getSource(),
                 session.getClientInfo(),
                 session.getCatalog(),
@@ -86,6 +89,7 @@ public class ClientSession
         return new ClientSession(
                 session.getServer(),
                 session.getUser(),
+                session.getPassword(),
                 session.getSource(),
                 session.getClientInfo(),
                 session.getCatalog(),
@@ -104,6 +108,7 @@ public class ClientSession
         return new ClientSession(
                 session.getServer(),
                 session.getUser(),
+                session.getPassword(),
                 session.getSource(),
                 session.getClientInfo(),
                 session.getCatalog(),
@@ -122,6 +127,7 @@ public class ClientSession
         return new ClientSession(
                 session.getServer(),
                 session.getUser(),
+                session.getPassword(),
                 session.getSource(),
                 session.getClientInfo(),
                 session.getCatalog(),
@@ -138,6 +144,7 @@ public class ClientSession
     public ClientSession(
             URI server,
             String user,
+            String password,
             String source,
             String clientInfo,
             String catalog,
@@ -149,12 +156,13 @@ public class ClientSession
             boolean debug,
             Duration clientRequestTimeout)
     {
-        this(server, user, source, clientInfo, catalog, schema, timeZoneId, locale, properties, emptyMap(), transactionId, debug, clientRequestTimeout);
+        this(server, user, password, source, clientInfo, catalog, schema, timeZoneId, locale, properties, emptyMap(), transactionId, debug, clientRequestTimeout);
     }
 
     public ClientSession(
             URI server,
             String user,
+            String password,
             String source,
             String clientInfo,
             String catalog,
@@ -169,6 +177,7 @@ public class ClientSession
     {
         this.server = requireNonNull(server, "server is null");
         this.user = user;
+        this.password = password;
         this.source = source;
         this.clientInfo = clientInfo;
         this.catalog = catalog;
@@ -199,6 +208,11 @@ public class ClientSession
     public String getUser()
     {
         return user;
+    }
+
+    public String getPassword()
+    {
+      return password;
     }
 
     public String getSource()

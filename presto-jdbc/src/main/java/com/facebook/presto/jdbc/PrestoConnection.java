@@ -67,12 +67,13 @@ public class PrestoConnection
     private final URI jdbcUri;
     private final URI httpUri;
     private final String user;
+    private final String password;
     private final Map<String, String> clientInfo = new ConcurrentHashMap<>();
     private final Map<String, String> sessionProperties = new ConcurrentHashMap<>();
     private final AtomicReference<String> transactionId = new AtomicReference<>();
     private final QueryExecutor queryExecutor;
 
-    PrestoConnection(PrestoDriverUri uri, String user, QueryExecutor queryExecutor)
+    PrestoConnection(PrestoDriverUri uri, String user, String password, QueryExecutor queryExecutor)
             throws SQLException
     {
         requireNonNull(uri, "uri is null");
@@ -82,6 +83,7 @@ public class PrestoConnection
         this.catalog.set(uri.getCatalog());
 
         this.user = requireNonNull(user, "user is null");
+        this.password = password;
         this.queryExecutor = requireNonNull(queryExecutor, "queryExecutor is null");
         timeZoneId.set(TimeZone.getDefault().getID());
         locale.set(Locale.getDefault());
@@ -587,6 +589,7 @@ public class PrestoConnection
         ClientSession session = new ClientSession(
                 httpUri,
                 user,
+                password,
                 source,
                 clientInfo.get("ClientInfo"),
                 catalog.get(),
